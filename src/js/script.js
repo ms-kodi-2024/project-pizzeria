@@ -377,6 +377,9 @@ const select = {
         deliveryFee: settings.cart.defaultDeliveryFee,
         products: [],
       }
+      for(let prod of thisCart.products) {
+        payload.products.push(prod.getData());
+      }
       const url = settings.db.url + '/' + settings.db.orders;
       const options = {
         method: 'POST',
@@ -385,9 +388,6 @@ const select = {
         },
         body: JSON.stringify(payload),
       };
-      for(let prod of thisCart.products) {
-        payload.products.push(prod.getData());
-      }
       fetch(url, options)
       .then(function(response){
         return response.json();

@@ -1,4 +1,5 @@
-import { templates, select } from '../settings.js';
+import { templates, select, settings } from '../settings.js';
+import utils from '../utils.js';
 import AmountWidget from './AmountWidget.js';
 import DatePicker from './DatePicker.js';
 import HourPicker from './HourPicker.js';
@@ -8,6 +9,53 @@ class Booking {
     const thisBooking = this;
     thisBooking.render(element);
     thisBooking.initWidgets();
+    thisBooking.getData();
+  }
+  
+  getData() {
+    const thisBooking = this;
+    const startDateParam = settings.db.dateStartParamKey + '=' + utils.dateToStr(thisBooking.datePicker.minDate);
+    const endDateParam = settings.db.dateEndParamKey + '=' + utils.dateToStr(thisBooking.datePicker.maxDate);
+    const params = {
+      bookings: [
+        startDateParam,
+        endDateParam,
+      ],
+      eventsCurrent: [
+        settings.db.notRepeatParam,
+        startDateParam,
+        endDateParam,
+      ],
+      eventsRepeat: [
+        settings.db.repeatParam,
+        endDateParam,
+      ],
+    };
+    
+    const urls = {
+      bookings: settings.db.url + '/' + settings.db.bookings + '?' + params.bookings.join('&'),
+      eventsCurrent: settings.db.url + '/' + settings.db.events + '?' + params.eventsCurrent.join('&'),
+      eventsRepeat: settings.db.url + '/' + settings.db.events + '?' + params.eventsRepeat.join('&'),
+    };
+
+    Promise.all([
+      fetch(urls.bookings),
+      fetch(urls.eventsCurrent),
+      fetch(urls.eventsRepeat),
+    ])
+      .then(function (allResponses) {
+        const bookingResponse = allResponses[0];
+        const eventsCurrent = allResponses[1];
+        const eventsRepeat = allResponses[2];
+        return Promise.all([
+          bookingResponse.json(),
+          eventsCurrent.json(),
+          eventsRepeat.json(),
+        ]);
+      })
+      .then(function(bookings){
+        console.log(bookings);
+      })
   }
 
   render(element) {

@@ -1,4 +1,4 @@
-import { settings, select, classNames, templates } from "./settings.js";
+import { settings, select, classNames } from "./settings.js";
 import Product from "./components/Product.js";
 import Cart from "./components/Cart.js";
 import Booking from "./components/Booking.js";
@@ -50,7 +50,6 @@ const app = {
       return rawResponse.json();
     })
     .then(function(parsedResponse){
-      console.log('parsedResponse:', parsedResponse);
       thisApp.data.products = parsedResponse;
       thisApp.initMenu();
     });

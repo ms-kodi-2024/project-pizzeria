@@ -2,6 +2,7 @@ import { settings, select, classNames } from "./settings.js";
 import Product from "./components/Product.js";
 import Cart from "./components/Cart.js";
 import Booking from "./components/Booking.js";
+import Home from "./components/Home.js";
 
 const app = {
   initPages: function () {
@@ -26,6 +27,10 @@ const app = {
         window.location.hash = '#/' + id;
       });
     }
+    window.addEventListener('hashchange', function() {
+      const newPageId = window.location.hash.replace('#/', '');
+      thisApp.activatePage(newPageId);
+    });
   },
   
   activatePage: function(pageId){
@@ -38,6 +43,22 @@ const app = {
         classNames.nav.active,
         link.getAttribute('href') == '#' + pageId
       );
+    }
+  },
+
+  initHome: function() {
+    const thisApp = this;
+    const homeElem = document.querySelector(select.containerOf.home);
+    thisApp.home = new Home(homeElem);
+    thisApp.homeLinks = document.querySelectorAll(select.nav.homeLinks);
+    for (let link of thisApp.homeLinks) {
+      link.addEventListener('click', function(event) {
+        event.preventDefault();
+        const clickedElement = event.target.closest('a');
+        const id = clickedElement.getAttribute('href').replace('#', '');
+        thisApp.activatePage(id);
+        window.location.hash = '#/' + id;
+      });
     }
   },
 
@@ -61,6 +82,7 @@ const app = {
       new Product(thisApp.data.products[productData].id, thisApp.data.products[productData]); 
     }
   },
+
   initCart: function() {
     const thisApp = this;
     const cartElem = document.querySelector(select.containerOf.cart);
@@ -71,7 +93,7 @@ const app = {
     })
   },
 
-  initBooking: function () {
+  initBooking: function() {
     const thisApp = this;
     const bookingElem = document.querySelector(select.containerOf.booking);
     thisApp.booking = new Booking(bookingElem);
@@ -85,6 +107,7 @@ const app = {
     // console.log('settings:', settings);
     // console.log('templates:', templates);
     thisApp.initPages();
+    thisApp.initHome();
     thisApp.initData();
     thisApp.initCart();
     thisApp.initBooking();
